@@ -39,6 +39,9 @@ const operate = function (operator, firstNum, secondNum) {
       return divide(a, b);
   }
 };
+function roundResult(number) {
+  return Math.round(number * 1000) / 1000;
+}
 
 function clear() {
   display.textContent = "0";
@@ -58,7 +61,9 @@ function evaluate() {
   }
   secondOperand = display.textContent;
   console.log(operator, firstOperand, secondOperand);
-  display.textContent = operate(operator, firstOperand, secondOperand);
+  display.textContent = roundResult(
+    operate(operator, firstOperand, secondOperand)
+  );
   operator = null;
 }
 
