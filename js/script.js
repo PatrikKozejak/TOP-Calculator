@@ -45,6 +45,7 @@ function clear() {
   firstOperand = display.textContent;
   secondOperand = "";
   operator = null;
+  newLine = true;
 }
 
 function evaluate() {
