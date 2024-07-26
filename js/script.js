@@ -1,4 +1,5 @@
 let display = document.querySelector("#display");
+let secondaryDisplay = document.querySelector("#secondaryDisplay");
 let numButtons = document.querySelectorAll("[data-num]");
 let operatorButtons = document.querySelectorAll("[data-operator]");
 let equalsBtn = document.querySelector("#equalsBtn");
@@ -46,36 +47,48 @@ function roundResult(number) {
 function clear() {
   display.textContent = "0";
   firstOperand = display.textContent;
-  secondOperand = "";
+  secondaryDisplay.textContent = "";
+  secondOperand = null;
   operator = null;
   newLine = true;
 }
 
 function evaluate() {
   if (display.textContent === "0" && operator === "/") {
-    alert("You can't divide by 0!");
-    clear();
+    display.textContent = "ERROR";
+    secondaryDisplay.textContent = "You can't divide by 0";
+    firstOperand = display.textContent;
+    secondOperand = null;
+    operator = null;
+    newLine = true;
     return;
   } else if (operator === null) {
     return;
   }
-  secondOperand = display.textContent;
+
+  secondOperand === null
+    ? (secondOperand = display.textContent)
+    : secondOperand;
   console.log(operator, firstOperand, secondOperand);
   display.textContent = roundResult(
     operate(operator, firstOperand, secondOperand)
   );
-  operator = null;
+  secondaryDisplay.textContent = `${firstOperand} ${operator} ${secondOperand} =`;
+  firstOperand = display.textContent;
+  newLine = true;
+  // operator = null;
 }
 
 function setOperation(operatorBtn) {
   if (operator === null) {
     firstOperand = display.textContent;
     operator = operatorBtn.getAttribute("data-operator");
+    secondaryDisplay.textContent = `${firstOperand} ${operator} `;
     newLine = true;
   } else {
-    secondOperand = display.textContent;
+    // secondOperand = display.textContent;
     evaluate();
-    firstOperand = display.textContent;
+    secondaryDisplay.textContent = `${firstOperand} ${operator} `;
     operator = operatorBtn.getAttribute("data-operator");
     newLine = true;
   }
