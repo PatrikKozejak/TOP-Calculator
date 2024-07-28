@@ -59,7 +59,9 @@ function clear() {
 }
 
 function deleteNumber() {
-  if (display.textContent !== "0" && display.textContent.length > 0) {
+  if (evaluated) {
+    secondaryDisplay.textContent = "";
+  } else if (display.textContent !== "0" && display.textContent.length > 0) {
     display.textContent = display.textContent.slice(0, -1);
     if (display.textContent.length === 0) {
       display.textContent = "0";
@@ -80,43 +82,62 @@ function evaluate() {
   } else if (operator === null) {
     return;
   }
-  secondOperand = display.textContent;
   display.textContent = roundResult(
     operate(operator, firstOperand, secondOperand)
   );
-  secondaryDisplay.textContent = `${firstOperand} ${operator} ${secondOperand} =`;
-  firstOperand = display.textContent;
-  lastOperator = operator;
-  newLine = true;
-  evaluated = true;
+  if (evaluated) {
+    secondaryDisplay.textContent = `${firstOperand} ${operator} ${secondOperand} =`;
+  } else {
+    secondaryDisplay.textContent = `${firstOperand} ${operator} `;
+  }
 }
 
 function setOperation(operatorBtn) {
-  if (operator === null) {
+  if (operator === null && operatorBtn !== "=" && operatorBtn !== "Enter") {
     firstOperand = display.textContent;
-  } else {
-    if (evaluated === true) {
-      evaluated = false;
-      firstOperand = display.textContent;
+    operator = operatorBtn;
+    secondaryDisplay.textContent = `${firstOperand} ${operator} `;
+  } // Prevents advancement by clicking on "=" as the first thing
+  else if (operator !== null) {
+    if (operatorBtn === "=" || operatorBtn === "Enter") {
+      if (evaluated) {
+        firstOperand = display.textContent;
+      } else {
+        secondOperand = display.textContent;
+        evaluated = true;
+      }
     } else {
-      evaluate();
+      if (evaluated) {
+        firstOperand = display.textContent;
+        operator = operatorBtn;
+        secondaryDisplay.textContent = `${firstOperand} ${operator} `;
+        evaluated = false;
+        return;
+      } else {
+        operator = operatorBtn;
+        secondOperand = display.textContent;
+        evaluated = true;
+      }
     }
+    evaluate();
   }
-  operator = operatorBtn;
-  secondaryDisplay.textContent = `${firstOperand} ${operator} `;
   newLine = true;
 }
 
 function appendNumber(number) {
-  if (
-    (newLine && number !== ".") ||
-    (display.textContent === "0" && number === "0")
-  ) {
-    display.textContent = number;
+  if (!evaluated) {
+    if (display.textContent === "0" && number === "0") {
+      return;
+    } else if (newLine && number !== ".") {
+      display.textContent = number;
+    } else {
+      display.textContent += number;
+    }
+    newLine = false;
   } else {
-    display.textContent += number;
+    clear();
+    appendNumber(number);
   }
-  newLine = false;
 }
 
 numButtons.forEach((button) => {
@@ -137,7 +158,6 @@ pointButton.addEventListener("click", () => {
   }
 });
 
-equalsBtn.addEventListener("click", evaluate);
 clearBtn.addEventListener("click", clear);
 backspaceBtn.addEventListener("click", deleteNumber);
 
@@ -150,11 +170,11 @@ window.addEventListener("keydown", (event) => {
     keyName === "/" ||
     keyName === "*" ||
     keyName === "+" ||
-    keyName === "-"
+    keyName === "-" ||
+    keyName === "=" ||
+    keyName === "Enter"
   ) {
     setOperation(keyName);
-  } else if (keyName === "=" || keyName === "Enter") {
-    evaluate();
   } else if (keyName === ".") {
     if (display.textContent.indexOf(".") === -1) {
       appendNumber(".");
